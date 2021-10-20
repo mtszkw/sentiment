@@ -1,9 +1,11 @@
 from metaflow import FlowSpec, Parameter, step
-from sklearn.model_selection import train_test_split
 import pandas as pd
+from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.svm import LinearSVC
 
+from data_embedding import TfIdfDataVectorizer
 from data_processing import Sentiment140Preprocessing
-
 
 class TrainingFlow(FlowSpec):
     data_path = Parameter('data_path', help='Path to CSV file with input data', required=True)
@@ -41,16 +43,25 @@ class TrainingFlow(FlowSpec):
             test_size=self.test_size,
             random_state=self.rnd_seed)
         print(f"Train set size: {self.X_train.shape}, test set: {self.X_test.shape}")
-        self.next(self.train_convnet)
+        self.next(self.tfidf_vectorization)
 
     @step
-    def train_convnet(self):
-        print('Training Convolutional Neural Network...')
+    def tfidf_vectorization(self):
+        tfidf = TfIdfDataVectorizer()
+        self.X_train, self.X_test = tfidf(self.X_train, self.X_test)
+        print(f"Train set size: {self.X_train.shape}, test set: {self.X_test.shape}")
+        self.next(self.train_linearsvc)
+
+    @step
+    def train_linearsvc(self):
+        svc_model = LinearSVC()
+        svc_model.fit(self.X_train, self.y_train)
+        y_pred = svc_model.predict(self.X_test)
+        print(f"LinearSVC:\n{classification_report(self.y_test, y_pred)}")
         self.next(self.visualize_results)
 
     @step
     def visualize_results(self):
-        print('Visualizing results...')
         self.next(self.end)
 
     @step

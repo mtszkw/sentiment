@@ -5,7 +5,6 @@ from nltk import text
 from nltk.corpus import stopwords
 import pandas as pd
 
-
 class Sentiment140Preprocessing():
     def __init__(self):
         nltk.download('stopwords')
@@ -15,7 +14,8 @@ class Sentiment140Preprocessing():
         df_raw['text'] = df_raw['text'].apply(self._convert_to_lowercase)
         df_raw['text'] = df_raw['text'].apply(self._replace_regex_patterns)
         df_raw['text'] = df_raw['text'].apply(self._remove_stopwords)
-        print(f"Processed data: {df_raw.head()}")
+        df_raw['sentiment'] = df_raw['sentiment'].replace(4, 1)
+        print(f"Processed data:\n{df_raw.head()}")
         return df_raw['text'], df_raw['sentiment']
 
     def _remove_unnecessary_columns(self, df_reviews: pd.DataFrame):

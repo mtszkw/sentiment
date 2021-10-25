@@ -1,11 +1,13 @@
-from metaflow import FlowSpec, Parameter, step, S3
+from metaflow import FlowSpec, Parameter, step
 import pandas as pd
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import train_test_split
 
 from data_embedding import TfIdfDataVectorizer
 from data_processing import Sentiment140Preprocessing
+from data_reader import DataReader
 from model_linearsvc import LinearSVCModel
+
 
 class TrainingFlow(FlowSpec):
     # data_path = Parameter('data_path', help='Path to CSV file with input data', required=True)
@@ -20,22 +22,10 @@ class TrainingFlow(FlowSpec):
 
     @step
     def get_data(self):
-        print(f'Downloading data from {self.s3_input_csv_path}')
-        try:
-            data_columns  = ["sentiment", "ids", "date", "flag", "user", "text"]
-            skip_every_nthline = int(1/self.quickrun_pct) if self.quickrun_pct < 1.0 else 1
-            print(f"Skipping every {skip_every_nthline}th line thus reading {self.quickrun_pct*100}% of data")
+        data_columns  = ["sentiment", "ids", "date", "flag", "user", "text"]
+        skip_every_nthline = int(1/self.quickrun_pct) if self.quickrun_pct < 1.0 else 1
 
-            with S3() as s3:
-                print(f"Downloading input file from {self.s3_input_csv_path}")
-                self.s3_csv_file = s3.get(self.s3_input_csv_path)
-                self.df_raw = pd.read_csv(
-                    self.s3_csv_file.path,
-                    names=data_columns,
-                    skiprows=lambda i: i % skip_every_nthline != 0)
-                print(f"Found {self.df_raw.shape} data frame in {self.s3_csv_file.path}")
-        except Exception as exc:
-            raise(f"Failure when reading data: {exc}")
+        self.df_raw = DataReader.download_s3_and_read(self.s3_input_csv_path, data_columns, skip_every_nthline)
         self.next(self.process_data)
 
     @step
@@ -54,10 +44,10 @@ class TrainingFlow(FlowSpec):
             test_size=self.test_size,
             random_state=self.rnd_seed)
         print(f"Train set size: [{self.X_train.shape}, {self.y_train.shape}], test set: [{self.X_test.shape}, {self.y_test.shape}]")
-        self.next(self.tfidf_vectorization)
+        self.next(self.create_embeddings)
 
     @step
-    def tfidf_vectorization(self):
+    def create_embeddings(self):
         tfidf = TfIdfDataVectorizer()
         self.X_train, self.X_test = tfidf(self.X_train, self.X_test)
         print(f"Train set size: {self.X_train.shape}, test set: {self.X_test.shape}")

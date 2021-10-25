@@ -1,7 +1,6 @@
 import re
 
 import nltk
-from nltk import text
 from nltk.corpus import stopwords
 import pandas as pd
 

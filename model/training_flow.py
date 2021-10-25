@@ -33,7 +33,7 @@ class TrainingFlow(FlowSpec):
                 skiprows=lambda i: i % skip_every_nthline != 0)
             print(f"Reading {self.df_raw.shape} data frame from {self.data_path}")
         except Exception as exc:
-            print(f"Exception: {exc}")
+            raise(f"Failure when reading data: {exc}")
         self.next(self.process_data)
 
     @step

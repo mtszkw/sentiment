@@ -1,17 +1,15 @@
-from metaflow import FlowSpec, Parameter, step
+from metaflow import FlowSpec, Parameter, step, S3
 import pandas as pd
-import scipy
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 from sklearn.model_selection import train_test_split
-import torch
 
 from data_embedding import TfIdfDataVectorizer
 from data_processing import Sentiment140Preprocessing
 from model_linearsvc import LinearSVCModel
-from model_mlp import MLPModel
 
 class TrainingFlow(FlowSpec):
-    data_path = Parameter('data_path', help='Path to CSV file with input data', required=True)
+    # data_path = Parameter('data_path', help='Path to CSV file with input data', required=True)
+    s3_input_csv_path = Parameter('s3_input_csv_path', help='Path to input CSV file stored in S3 bucket, starts with s3://', required=True)
     rnd_seed = Parameter('rnd_seed', help='Seed for Random Number Generator', default=42)
     test_size = Parameter('test_size', help='Size of test set for train-test split (in %)', default=0.1)
     quickrun_pct = Parameter('quickrun_pct', help='% of data to use for quick run (e.g. 0.1, 1 to use all)', default=1.0)
@@ -22,16 +20,20 @@ class TrainingFlow(FlowSpec):
 
     @step
     def get_data(self):
-        print(f'Downloading data from {self.data_path}')
+        print(f'Downloading data from {self.s3_input_csv_path}')
         try:
             data_columns  = ["sentiment", "ids", "date", "flag", "user", "text"]
             skip_every_nthline = int(1/self.quickrun_pct) if self.quickrun_pct < 1.0 else 1
             print(f"Skipping every {skip_every_nthline}th line thus reading {self.quickrun_pct*100}% of data")
-            self.df_raw = pd.read_csv(
-                self.data_path,
-                names=data_columns,
-                skiprows=lambda i: i % skip_every_nthline != 0)
-            print(f"Reading {self.df_raw.shape} data frame from {self.data_path}")
+
+            with S3() as s3:
+                print(f"Downloading input file from {self.s3_input_csv_path}")
+                self.s3_csv_file = s3.get(self.s3_input_csv_path)
+                self.df_raw = pd.read_csv(
+                    self.s3_csv_file.path,
+                    names=data_columns,
+                    skiprows=lambda i: i % skip_every_nthline != 0)
+                print(f"Found {self.df_raw.shape} data frame in {self.s3_csv_file.path}")
         except Exception as exc:
             raise(f"Failure when reading data: {exc}")
         self.next(self.process_data)

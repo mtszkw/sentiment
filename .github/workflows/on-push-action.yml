@@ -32,5 +32,5 @@ jobs:
     - name: Run quick training
       run: |
         python3 model/training_flow.py run \
-          --data_path=data/training.1600000.processed.noemoticon.csv \
+          --s3_input_csv_path=s3://sentimental-mlops-project/training.1600000.processed.noemoticon.csv \
           --quickrun_pct=0.001

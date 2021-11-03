@@ -15,7 +15,8 @@ on:
         description: 'Tags for this pipeline execution (optional)'  
 
 jobs:
-  run_quick_training:
+
+  run_full_training:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -43,3 +44,25 @@ jobs:
           --quickrun_pct=1.0 \
           --rnd_seed=${{ github.event.inputs.rnd_seed }} \
           --test_size=${{ github.event.inputs.test_size }}
+
+  deploy_model:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r model/requirements.txt
+    - name: Set AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+    - name: Query S3 bucket with input data
+      run: |
+        aws s3 ls s3://sentimental-mlops-project

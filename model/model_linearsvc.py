@@ -1,3 +1,4 @@
+from joblib import dump, load
 import pandas as pd
 from sklearn.svm import LinearSVC
 
@@ -13,3 +14,9 @@ class LinearSVCModel():
         self.y_pred = self.svc_model.predict(X)
         return self.y_pred
 
+    def save_model(self, path_with_extension: str):
+        dump(self.svc_model, path_with_extension)
+        print(f"Saving LinearSVC model to {path_with_extension}")
+
+    def load_model(self, path_with_extension: str):
+        self.svc_model = load(path_with_extension)

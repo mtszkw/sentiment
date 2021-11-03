@@ -33,3 +33,6 @@ jobs:
         python3 model/training_flow.py run \
           --s3_input_csv_path=s3://sentimental-mlops-project/training.1600000.processed.noemoticon.csv \
           --quickrun_pct=0.01
+    - name: Check for model artifact
+      run: |
+        ls

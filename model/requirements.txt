@@ -1,5 +1,5 @@
 metaflow
 pandas
-torch
 nltk
 scikit-learn
+joblib

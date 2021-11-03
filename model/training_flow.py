@@ -1,5 +1,6 @@
+import time
+
 from metaflow import FlowSpec, Parameter, step
-import pandas as pd
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import train_test_split
 
@@ -59,6 +60,8 @@ class TrainingFlow(FlowSpec):
         svc_model.train(self.X_train, self.y_train)
         self.linearsvc_y_pred = svc_model.predict(self.X_test)
         print(f"Linear SVC accuracy on test set = {accuracy_score(self.y_test, self.linearsvc_y_pred)}")
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        svc_model.save_model(f'linearsvc_{timestr}.joblib')
         self.next(self.visualize_results)
 
     @step

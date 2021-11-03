@@ -1,0 +1,35 @@
+name: Quick On-Push
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  run_quick_training:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r model/requirements.txt
+    - name: Set AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+    - name: Query S3 bucket with input data
+      run: |
+        aws s3 ls s3://sentimental-mlops-project
+    - name: Train on a subset of data
+      run: |
+        python3 model/training_flow.py run \
+          --s3_input_csv_path=s3://sentimental-mlops-project/training.1600000.processed.noemoticon.csv \
+          --quickrun_pct=0.01

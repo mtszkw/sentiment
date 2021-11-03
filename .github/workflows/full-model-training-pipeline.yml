@@ -12,7 +12,7 @@ on:
         required: true
         default: '0.1'
       tags:
-        description: 'Full Model Training Pipeline'  
+        description: 'Tags for this pipeline execution (optional)'  
 
 jobs:
   run_quick_training:

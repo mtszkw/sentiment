@@ -43,4 +43,3 @@ jobs:
           --quickrun_pct=1.0 \
           --rnd_seed=${{ github.event.inputs.rnd_seed }} \
           --test_size=${{ github.event.inputs.test_size }}
-    - name: 

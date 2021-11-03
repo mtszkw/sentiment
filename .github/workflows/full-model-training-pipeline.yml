@@ -1,5 +1,19 @@
 name: Full Model Training
 
+on: 
+  workflow_dispatch:
+    inputs:
+      rnd_seed:
+        description: 'Seed for Random Number Generator'     
+        required: true
+        default: '42'
+      test_size:
+        description: 'Size of test set for train-test split (in %)'     
+        required: true
+        default: '0.1'
+      tags:
+        description: 'Full Model Training Pipeline'  
+
 jobs:
   run_quick_training:
     runs-on: ubuntu-latest
@@ -27,6 +41,6 @@ jobs:
         python3 model/training_flow.py run \
           --s3_input_csv_path=s3://sentimental-mlops-project/training.1600000.processed.noemoticon.csv \
           --quickrun_pct=1.0 \
-          --rnd_seed=42 \
-          --test_siz=0.1
+          --rnd_seed=${{ github.event.inputs.rnd_seed }} \
+          --test_size=${{ github.event.inputs.test_size }}
     - name: 

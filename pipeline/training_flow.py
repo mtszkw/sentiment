@@ -1,13 +1,15 @@
 import time
 
+# External deps
 from metaflow import FlowSpec, Parameter, step
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import train_test_split
 
-from data_embedding import TfIdfDataVectorizer
-from data_processing import Sentiment140Preprocessing
-from data_reader import DataReader
-from model_linearsvc import LinearSVCModel
+# Internal deps
+from data.sentiment140_preprocess import Sentiment140Preprocessing
+from data.tfidf import TfIdfDataVectorizer
+from models.linearsvc import LinearSVCModel
+from s3_handler import S3Handler
 
 
 class TrainingFlow(FlowSpec):
@@ -26,11 +28,11 @@ class TrainingFlow(FlowSpec):
         data_columns  = ["sentiment", "ids", "date", "flag", "user", "text"]
         skip_every_nthline = int(1/self.quickrun_pct) if self.quickrun_pct < 1.0 else 1
 
-        self.df_raw = DataReader.download_s3_and_read(self.s3_input_csv_path, data_columns, skip_every_nthline)
-        self.next(self.process_data)
+        self.df_raw = S3Handler.download_s3_and_read(self.s3_input_csv_path, data_columns, skip_every_nthline)
+        self.next(self.preprocess_data)
 
     @step
-    def process_data(self):
+    def preprocess_data(self):
         data_proc = Sentiment140Preprocessing()
         self.df_text, self.df_sentiment = data_proc(
             self.df_raw,
@@ -56,12 +58,17 @@ class TrainingFlow(FlowSpec):
 
     @step
     def train_linearsvc(self):
-        svc_model = LinearSVCModel()
-        svc_model.train(self.X_train, self.y_train)
-        self.linearsvc_y_pred = svc_model.predict(self.X_test)
+        self.svc_model = LinearSVCModel()
+        self.svc_model.train(self.X_train, self.y_train)
+        self.linearsvc_y_pred = self.svc_model.predict(self.X_test)
         print(f"Linear SVC accuracy on test set = {accuracy_score(self.y_test, self.linearsvc_y_pred)}")
+        self.next(self.save_model_to_s3)
+
+    @step
+    def save_model_to_s3(self):
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        svc_model.save_model(f'linearsvc_{timestr}.joblib')
+        self.svc_model.save_model_local(f'linearsvc_{timestr}.joblib')
+        # self.svc_model.save_model_s3(f's3://sentimental/artifacts/linearsvc_model/linearsvc_{timestr}.joblib')
         self.next(self.visualize_results)
 
     @step

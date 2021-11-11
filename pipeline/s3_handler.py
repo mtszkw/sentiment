@@ -4,7 +4,7 @@ import pandas as pd
 from typing import List
 
 
-class DataReader():
+class S3Handler():
     def __init__(self, ):
         pass
 

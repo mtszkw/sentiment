@@ -1,4 +1,4 @@
-name: Full Model Training
+name: Full Pipeline (Manual)
 
 on: 
   workflow_dispatch:
@@ -39,7 +39,7 @@ jobs:
         aws s3 ls s3://sentimental-mlops-project
     - name: Train on full dataset
       run: |
-        python3 model/training_flow.py run \
+        python3 pipeline/training_flow.py run \
           --s3_input_csv_path=s3://sentimental-mlops-project/training.1600000.processed.noemoticon.csv \
           --quickrun_pct=1.0 \
           --rnd_seed=${{ github.event.inputs.rnd_seed }} \

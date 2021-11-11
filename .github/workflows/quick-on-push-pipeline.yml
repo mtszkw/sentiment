@@ -1,4 +1,4 @@
-name: Quick On-Push
+name: Dry-Run Pipeline (On Push)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  run_quick_training:
+  quick_pipeline_dryrun:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -30,7 +30,7 @@ jobs:
         aws s3 ls s3://sentimental-mlops-project
     - name: Train on a subset of data
       run: |
-        python3 model/training_flow.py run \
+        python3 pipeline/training_flow.py run \
           --s3_input_csv_path=s3://sentimental-mlops-project/training.1600000.processed.noemoticon.csv \
           --quickrun_pct=0.01
     - name: Check for model artifact

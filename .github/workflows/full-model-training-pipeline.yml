@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r model/requirements.txt
+        python -m pip install -r pipeline/requirements.txt
     - name: Set AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -56,7 +56,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r model/requirements.txt
+        python -m pip install -r pipeline/requirements.txt
     - name: Set AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:

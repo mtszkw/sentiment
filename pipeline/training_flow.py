@@ -36,7 +36,8 @@ class TrainingFlow(FlowSpec):
         data_proc = Sentiment140Preprocessing()
         self.df_text, self.df_sentiment = data_proc(
             self.df_raw,
-            target='sentiment')
+            text_col='text',
+            target_col='sentiment')
         self.next(self.train_test_split)
     
     @step

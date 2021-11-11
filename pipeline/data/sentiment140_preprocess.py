@@ -8,18 +8,22 @@ class Sentiment140Preprocessing():
     def __init__(self):
         nltk.download('stopwords')
 
-    def __call__(self, df_raw: pd.DataFrame, target: str):
-        df_raw = self._remove_unnecessary_columns(df_raw)
-        df_raw['text'] = df_raw['text'].apply(self._convert_to_lowercase)
-        df_raw['text'] = df_raw['text'].apply(self._replace_regex_patterns)
-        df_raw['text'] = df_raw['text'].apply(self._remove_stopwords)
-        df_raw['sentiment'] = df_raw['sentiment'].replace(4, 1)
+    def __call__(self, df_raw: pd.DataFrame, text_col: str, target_col: str):
+        df_raw = self._remove_unnecessary_columns(df_raw, text_col, target_col)
+        df_raw[text_col] = df_raw[text_col].apply(self._convert_to_lowercase)
+        df_raw[text_col] = df_raw[text_col].apply(self._replace_regex_patterns)
+        df_raw[text_col] = df_raw[text_col].apply(self._remove_stopwords)
+        if target_col:
+            df_raw[target_col] = df_raw[target_col].replace(4, 1)
         print(f"Processed data:\n{df_raw.head()}")
-        return df_raw['text'], df_raw['sentiment']
+        return df_raw[text_col], df_raw[target_col]
 
-    def _remove_unnecessary_columns(self, df_reviews: pd.DataFrame):
+    def _remove_unnecessary_columns(self, df_reviews: pd.DataFrame, text_col: str, target_col: str):
         # Only sentiment (target) and text columns are important here.
-        return df_reviews[['sentiment', 'text']]
+        if target_col:
+            return df_reviews[[text_col, target_col]]
+        else:
+            return df_reviews[[text_col]]
 
     def _convert_to_lowercase(self, text_entry: str):
         return text_entry.lower()

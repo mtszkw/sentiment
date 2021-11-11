@@ -1,4 +1,4 @@
-name: Full Pipeline (Manual)
+name: Full Train & Deploy (Manual)
 
 on: 
   workflow_dispatch:

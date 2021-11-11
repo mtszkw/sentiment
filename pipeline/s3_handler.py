@@ -5,7 +5,7 @@ from typing import List
 
 
 class S3Handler():
-    def __init__(self, ):
+    def __init__(self):
         pass
 
     @staticmethod

@@ -1,4 +1,4 @@
-name: Dry-Run Pipeline (On Push)
+name: Dry-Run (On Push)
 
 on:
   push:

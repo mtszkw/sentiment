@@ -12,5 +12,5 @@ class TfIdfDataVectorizer():
         test_transformed = self.vectorizer.transform(X_test)
         return train_transformed, test_transformed
 
-    def serialize(self):
-        joblib.dump(self.vectorizer, 'tfidf_vectorizer.joblib')
+    def serialize(self, filename: str):
+        joblib.dump(self.vectorizer, filename)

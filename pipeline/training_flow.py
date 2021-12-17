@@ -84,7 +84,8 @@ class TrainingFlow(FlowSpec):
         self.y_train.apply(preprocessor.replace_regex_patterns)
 
         tfidf = TfIdfDataVectorizer()
-        self.X_train, self.X_test = tfidf(self.X_train, self.X_test)
+        self.X_train, self.X_test = tfidf.train_and_transform(self.X_train, self.X_test)
+        tfidf.serialize('tfidf_vectorizer.joblib')
         print(f"Train set size: {self.X_train.shape}, test set: {self.X_test.shape}")
         self.next(self.train_linearsvc)
 

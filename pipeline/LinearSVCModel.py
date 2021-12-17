@@ -24,6 +24,9 @@ class LinearSVCModel():
             model.svc_model = joblib.load(model_local_path)
         return model
 
+    def preprocess(self):
+        pass
+
     def train(self, X_train: pd.DataFrame, y_train: pd.DataFrame):
         self.svc_model.fit(X_train, y_train)
         

@@ -1,5 +1,7 @@
 data/*.csv
 
 env/
+*-env/
+*.joblib
 .metaflow/
 .vscode/

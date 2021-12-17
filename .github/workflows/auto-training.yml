@@ -1,4 +1,4 @@
-name: Dry-Run (On Push)
+name: Auto Training (On Push)
 
 on:
   push:
@@ -7,31 +7,35 @@ on:
     branches: [ master ]
 
 jobs:
-  quick_pipeline_dryrun:
+  auto_training:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+
     - name: Install dependencies
       run: |
-        # python -m pip install --upgrade pip
-        # python -m pip install -r pipeline/requirements.txt
         make setup_environment
+
     - name: Set AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
+
     - name: Query S3 bucket with input data
       run: |
         aws s3 ls s3://mtszkw-github/sentiment/
+
     - name: Train on a subset of data
       run: |
-        make training QUICKRUN_PCT=0.1
+        make training QUICKRUN_PCT=0.1 RND_SEED=2020 TEST_SIZE=0.2
+
     - name: Check for model artifact
       run: |
         ls -al

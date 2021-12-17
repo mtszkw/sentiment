@@ -39,11 +39,11 @@ jobs:
         aws s3 ls s3://mtszkw-github/sentiment/
     - name: Train on full dataset
       run: |
-        python3 pipeline/training_flow.py run \
-          --s3_input_csv_path=s3://mtszkw-github/sentiment/training.1600000.processed.noemoticon.csv \
-          --quickrun_pct=1.0 \
-          --rnd_seed=${{ github.event.inputs.rnd_seed }} \
-          --test_size=${{ github.event.inputs.test_size }}
+        # python3 pipeline/training_flow.py run \
+          # --s3_input_csv_path=s3://mtszkw-github/sentiment/training.1600000.processed.noemoticon.csv \
+          # --quickrun_pct=1.0 \
+          # --rnd_seed=${{ github.event.inputs.rnd_seed }} \
+          # --test_size=${{ github.event.inputs.test_size }}
     - name: Check for model artifact
       run: |
         ls -al

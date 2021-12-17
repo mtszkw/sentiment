@@ -34,9 +34,11 @@ class TrainingFlow(FlowSpec):
         help='% of data to use for quick run (e.g. 0.1, 1 to use all)',
         default=1.0)
 
+
     @step
     def start(self):
         self.next(self.get_data)
+
 
     @step
     def get_data(self):
@@ -46,25 +48,27 @@ class TrainingFlow(FlowSpec):
         self.df_raw = S3Handler.download_s3_and_read(self.s3_input_csv_path, data_columns, skip_every_nthline)
         self.next(self.dataset_cleanup)
 
+
     @step
     def dataset_cleanup(self):
-        self.df_text = self.df_raw['text']
-        self.df_sentiment = self.df_raw['sentiment']
+        self.texts_list = self.df_raw['text'].tolist()
+        self.sentiments_list = self.df_raw['sentiment'].tolist()
         self.next(self.train_test_split)
 
     
     @step
     def train_test_split(self):
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
-            self.df_text,
-            self.df_sentiment,
+            self.texts_list,
+            self.sentiments_list,
             test_size=self.test_size,
             random_state=self.rnd_seed)
 
-        print(f"Train set size: [{self.X_train.shape}, {self.y_train.shape}], test set: [{self.X_test.shape}, {self.y_test.shape}]")
-        print("Train features sample:\n", self.X_train.head(n=5))
-        print("Train labels sample:\n", self.X_test.head(n=5))
+        print(f"Train set size: [x={len(self.X_train)}, y={len(self.y_train)}], test: [{len(self.X_test)}, {len(self.y_test)}]")
+        print("Train features sample:\n", self.X_train[:5])
+        print("Train labels sample:\n", self.X_test[:5])
         self.next(self.text_preprocessing)
+
 
     @step
     def text_preprocessing(self):
@@ -83,6 +87,7 @@ class TrainingFlow(FlowSpec):
         print(f"Train set size: {self.X_train.shape}, test set: {self.X_test.shape}")
         self.next(self.train_linearsvc)
 
+
     @step
     def train_linearsvc(self):
         self.svc_model = LinearSVCModel()
@@ -93,6 +98,7 @@ class TrainingFlow(FlowSpec):
         print(f"Linear SVC accuracy on test set = {self.test_acc}")
         self.next(self.save_model_to_s3)
 
+
     @step
     def save_model_to_s3(self):
         timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -100,10 +106,12 @@ class TrainingFlow(FlowSpec):
         # self.svc_model.save_model_s3(full_s3_path=f's3://mtszkw-github/sentiment/linearsvc_{timestr}.joblib')
         self.next(self.visualize_results)
 
+
     @step
     def visualize_results(self):
         print(f"LinearSVC:\n{classification_report(self.y_test, self.linearsvc_y_pred)}")
         self.next(self.end)
+
 
     @step
     def end(self):

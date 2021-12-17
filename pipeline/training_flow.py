@@ -64,9 +64,9 @@ class TrainingFlow(FlowSpec):
             test_size=self.test_size,
             random_state=self.rnd_seed)
 
-        print(f"Train set size: [x={len(self.X_train)}, y={len(self.y_train)}], test: [{len(self.X_test)}, {len(self.y_test)}]")
+        print(f"Train set size: {len(self.X_train)}, test: {len(self.X_test)}")
         print("Train features sample:\n", self.X_train[:5])
-        print("Train labels sample:\n", self.X_test[:5])
+        print("Train labels sample:\n", self.y_train[:5])
         self.next(self.text_preprocessing)
 
 
@@ -83,8 +83,10 @@ class TrainingFlow(FlowSpec):
 
         tfidf = TfIdfDataVectorizer()
         self.X_train, self.X_test = tfidf.train_and_transform(self.X_train, self.X_test)
-        tfidf.serialize('tfidf_vectorizer.joblib')
         print(f"Train set size: {self.X_train.shape}, test set: {self.X_test.shape}")
+
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        tfidf.serialize(f'tfidf_vectorizer_{timestr}.joblib')
         self.next(self.train_linearsvc)
 
 

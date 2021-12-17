@@ -73,13 +73,13 @@ class TrainingFlow(FlowSpec):
     @step
     def text_preprocessing(self):
         preprocessor = TextPreprocessing()
-        self.X_train.apply(preprocessor.convert_to_lowercase)
-        self.X_train.apply(preprocessor.remove_stopwords)
-        self.X_train.apply(preprocessor.replace_regex_patterns)
+        map(preprocessor.convert_to_lowercase, self.X_train)
+        map(preprocessor.remove_stopwords, self.X_train)
+        map(preprocessor.replace_regex_patterns, self.X_train)
 
-        self.y_train.apply(preprocessor.convert_to_lowercase)
-        self.y_train.apply(preprocessor.remove_stopwords)
-        self.y_train.apply(preprocessor.replace_regex_patterns)
+        map(preprocessor.convert_to_lowercase, self.y_train)
+        map(preprocessor.remove_stopwords, self.y_train)
+        map(preprocessor.replace_regex_patterns, self.y_train)
 
         tfidf = TfIdfDataVectorizer()
         self.X_train, self.X_test = tfidf.train_and_transform(self.X_train, self.X_test)

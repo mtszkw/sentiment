@@ -1,9 +1,13 @@
+echo "Creating new virtual environment..."
 python3 -m venv ./env
 
+echo "Activating the environment..."
 . ./env/bin/activate
 
-python3 -m pip install -r model/requirements.txt --quiet
+echo "Installing from requirements.txt file..."
+python3 -m pip install -r pipeline/requirements.txt --quiet
 
-python3 model/training_flow.py run \
-  --data_path=data/training.1600000.processed.noemoticon.csv \
-  --quickrun_pct=0.001
+echo "Running the training flow..."
+python3 pipeline/training_flow.py run \
+  --s3_input_csv_path=s3://sentimental-mlops-project/training.1600000.processed.noemoticon.csv \
+  --quickrun_pct=0.01

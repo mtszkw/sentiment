@@ -52,14 +52,6 @@ class TrainingFlow(FlowSpec):
         self.df_sentiment = self.df_raw['sentiment']
         self.next(self.train_test_split)
 
-    # @step
-    # def preprocess_data(self):
-        # data_proc = Sentiment140Preprocessing()
-        # self.df_text, self.df_sentiment = data_proc(
-        #     self.df_raw,
-        #     text_col='text',
-        #     target_col='sentiment')
-        # self.next(self.train_test_split)
     
     @step
     def train_test_split(self):
@@ -70,6 +62,8 @@ class TrainingFlow(FlowSpec):
             random_state=self.rnd_seed)
 
         print(f"Train set size: [{self.X_train.shape}, {self.y_train.shape}], test set: [{self.X_test.shape}, {self.y_test.shape}]")
+        print("Train features sample:\n", self.X_train.head(n=5))
+        print("Train labels sample:\n", self.X_test.head(n=5))
         self.next(self.text_preprocessing)
 
     @step

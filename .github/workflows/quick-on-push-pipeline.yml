@@ -28,11 +28,11 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
     - name: Query S3 bucket with input data
       run: |
-        aws s3 ls s3://sentimental-mlops-project
+        aws s3 ls s3://mtszkw-github/sentiment/
     - name: Train on a subset of data
       run: |
         # python3 pipeline/training_flow.py run \
-          # --s3_input_csv_path=s3://sentimental-mlops-project/training.1600000.processed.noemoticon.csv \
+          # --s3_input_csv_path=s3://mtszkw-github/sentiment/training.1600000.processed.noemoticon.csv \
           # --quickrun_pct=0.01
         make training
     - name: Check for model artifact

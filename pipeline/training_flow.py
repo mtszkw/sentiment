@@ -97,7 +97,7 @@ class TrainingFlow(FlowSpec):
     def save_model_to_s3(self):
         timestr = time.strftime("%Y%m%d-%H%M%S")
         self.svc_model.save_model_local(f'linearsvc_{timestr}_acc{self.test_acc}.joblib')
-        # self.svc_model.save_model_s3(full_s3_path=f's3://sentimental-mlops-project/linearsvc_{timestr}.joblib')
+        # self.svc_model.save_model_s3(full_s3_path=f's3://mtszkw-github/sentiment/linearsvc_{timestr}.joblib')
         self.next(self.visualize_results)
 
     @step

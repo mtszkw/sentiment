@@ -36,11 +36,11 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
     - name: Query S3 bucket with input data
       run: |
-        aws s3 ls s3://sentimental-mlops-project
+        aws s3 ls s3://mtszkw-github/sentiment/
     - name: Train on full dataset
       run: |
         python3 pipeline/training_flow.py run \
-          --s3_input_csv_path=s3://sentimental-mlops-project/training.1600000.processed.noemoticon.csv \
+          --s3_input_csv_path=s3://mtszkw-github/sentiment/training.1600000.processed.noemoticon.csv \
           --quickrun_pct=1.0 \
           --rnd_seed=${{ github.event.inputs.rnd_seed }} \
           --test_size=${{ github.event.inputs.test_size }}
@@ -69,4 +69,4 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
     - name: Query S3 bucket with input data
       run: |
-        aws s3 ls s3://sentimental-mlops-project
+        aws s3 ls s3://mtszkw-github/sentiment/

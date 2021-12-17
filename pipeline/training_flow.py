@@ -44,7 +44,7 @@ class TrainingFlow(FlowSpec):
         skip_every_nthline = int(1/self.quickrun_pct) if self.quickrun_pct < 1.0 else 1
 
         self.df_raw = S3Handler.download_s3_and_read(self.s3_input_csv_path, data_columns, skip_every_nthline)
-        self.next(self.preprocess_data)
+        self.next(self.dataset_cleanup)
 
     @step
     def dataset_cleanup(self):

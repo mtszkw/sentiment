@@ -39,3 +39,10 @@ jobs:
     - name: Check for model artifact
       run: |
         ls -al
+
+    - name: Test console app inference
+      run: |
+        python3 inference/console_app/inference.py \
+          --model_joblib_path=$(ls | grep linearsvc*.joblib) \
+          --vectorizer_joblib_path=$(ls | grep vectorizer*.joblib) \
+          --input_text="I am sure this test will end with a success!"

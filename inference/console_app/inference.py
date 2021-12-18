@@ -1,8 +1,13 @@
 import argparse
 import joblib
 
+
+import sys
+sys.path.append("./pipeline")
+sys.path.append("../../pipeline")
+
 # from sklearn.svm import LinearSVC
-from pipeline import TextPreprocessing
+from TextPreprocessing import TextPreprocessing
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

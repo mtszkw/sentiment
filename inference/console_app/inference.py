@@ -29,7 +29,7 @@ if __name__ == "__main__":
     map(preprocessor.replace_regex_patterns, input_text)
     print(f"Input text after preprocessing: {input_text}")
 
-    text_embeddings = vectorizer.transform(input_text)
+    text_embeddings = vectorizer.transform([input_text])
     print(f"Text embeddings: {text_embeddings}")
 
     output = clf.predict(text_embeddings)

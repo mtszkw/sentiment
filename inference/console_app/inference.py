@@ -11,9 +11,9 @@ from TextPreprocessing import TextPreprocessing
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("model_joblib_path", help="Path to the serialized model")
-    parser.add_argument("vectorizer_joblib_path", help="Path to the serialized vectorizer")
-    parser.add_argument("input_text", help="Input text to classify")
+    parser.add_argument("--model_joblib_path", help="Path to the serialized model")
+    parser.add_argument("--vectorizer_joblib_path", help="Path to the serialized vectorizer")
+    parser.add_argument("--input_text", help="Input text to classify")
 
     args = parser.parse_args()
     print(f"Arguments: {args}")

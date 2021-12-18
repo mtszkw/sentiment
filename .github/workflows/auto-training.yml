@@ -44,6 +44,6 @@ jobs:
       run: |
         pwd
         python3 inference/console_app/inference.py \
-          $(ls | grep linearsvc*.joblib) \
-          $(ls | grep vectorizer*.joblib) \
-          "I am sure this test will end with a success!"
+          --model_joblib_path=$(ls | grep linearsvc*.joblib) \
+          --vectorizer_joblib_path=$(ls | grep tfidf_vectorizer*.joblib) \
+          --input_text="I am sure this test will end with a success!"

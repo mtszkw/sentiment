@@ -52,6 +52,9 @@ class TrainingFlow(FlowSpec):
 
     @step
     def dataset_cleanup(self):
+        print(f"Rows before cleanup: {self.df_raw.shape}")
+        self.df_raw = self.df_raw[self.df_raw.sentiment != 2]
+        print(f"Rows after cleanup (only two classes): {self.df_raw.shape}")
         self.texts_list = self.df_raw['text'].tolist()
         self.sentiments_list = self.df_raw['sentiment'].tolist()
         self.next(self.train_test_split)

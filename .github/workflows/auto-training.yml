@@ -40,10 +40,12 @@ jobs:
       run: |
         ls -al
 
-    - name: Test console app inference
+    - name: Test Console App inference
       run: |
         pwd
-        python3 inference/console_app/inference.py \
+        python3 inference/console_app/main.py \
           --model_joblib_path=$(ls | grep linearsvc*.joblib) \
           --vectorizer_joblib_path=$(ls | grep tfidf_vectorizer*.joblib) \
-          --input_text="I am sure this test will end with a success!"
+          --input_text="I am sure this test will end with a success!" > output.txt
+        cat output.txt
+        grep Negative output.txt

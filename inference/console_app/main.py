@@ -27,14 +27,13 @@ if __name__ == "__main__":
     map(preprocessor.convert_to_lowercase, input_text)
     map(preprocessor.remove_stopwords, input_text)
     map(preprocessor.replace_regex_patterns, input_text)
-    print(f"Input text after preprocessing: {input_text}")
+    # print(f"Input text after preprocessing: {input_text}")
 
     text_embeddings = vectorizer.transform([input_text])
-    print(f"Text embeddings: {text_embeddings}")
+    # print(f"Text embeddings: {text_embeddings}")
 
     output = clf.predict(text_embeddings)[0]
 
     label_map = {0: 'Negative', 2: 'Neutral', 4: 'Positive'}
-    print(f"Model output: {label_map[output]}")
+    print(label_map[output])
 
-    assert label_map[output] == 'Positive'

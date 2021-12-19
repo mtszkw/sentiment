@@ -6,7 +6,6 @@ import sys
 sys.path.append("./pipeline")
 sys.path.append("../../pipeline")
 
-# from sklearn.svm import LinearSVC
 from TextPreprocessing import TextPreprocessing
 
 if __name__ == "__main__":

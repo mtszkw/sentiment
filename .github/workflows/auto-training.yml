@@ -34,7 +34,7 @@ jobs:
 
     - name: Train on a subset of data
       run: |
-        make training QUICKRUN_PCT=0.1 RND_SEED=2020 TEST_SIZE=0.2
+        make training QUICKRUN_PCT=0.25 RND_SEED=2020 TEST_SIZE=0.2
 
     - name: Check for model artifact
       run: |
@@ -43,15 +43,13 @@ jobs:
     - name: Test Console App inference
       run: |
         python3 inference/console_app/main.py \
-          --model_joblib_path=$(ls | grep linearsvc*.joblib) \
+          --model_joblib_path=$(ls | grep gradientboost_*.joblib) \
           --vectorizer_joblib_path=$(ls | grep tfidf_vectorizer*.joblib) \
           --input_text="I am sure this test will end with a success!" > output.txt
-        cat output.txt
         grep Positive output.txt
 
         python3 inference/console_app/main.py \
-          --model_joblib_path=$(ls | grep linearsvc*.joblib) \
+          --model_joblib_path=$(ls | grep gradientboost_*.joblib) \
           --vectorizer_joblib_path=$(ls | grep tfidf_vectorizer*.joblib) \
           --input_text="I hate writing YAML files, they are awful" > output.txt
-        cat output.txt
         grep Negative output.txt

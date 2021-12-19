@@ -9,7 +9,8 @@ from sklearn.model_selection import train_test_split
 # Internal deps
 from TextPreprocessing import *
 from TfIdfDataVectorizer import *
-from LinearSVCModel import *
+# from LinearSVCModel import *
+from GradientBoostingModel import *
 from s3_handler import S3Handler
 
 
@@ -87,31 +88,45 @@ class TrainingFlow(FlowSpec):
 
         timestr = time.strftime("%Y%m%d-%H%M%S")
         tfidf.serialize(f'tfidf_vectorizer_{timestr}.joblib')
-        self.next(self.train_linearsvc)
+        self.next(self.train_gradient_boosting_clf)
 
+
+    # @step
+    # def train_linearsvc(self):
+    #     self.svc_model = LinearSVCModel()
+    #     self.svc_model.train(self.X_train, self.y_train)
+    #     self.linearsvc_y_pred = self.svc_model.predict(self.X_test)
+
+    #     self.test_acc = accuracy_score(self.y_test, self.linearsvc_y_pred)
+    #     print(f"Linear SVC accuracy on test set = {self.test_acc}")
+    #     self.next(self.save_model_to_s3)
 
     @step
-    def train_linearsvc(self):
-        self.svc_model = LinearSVCModel()
-        self.svc_model.train(self.X_train, self.y_train)
-        self.linearsvc_y_pred = self.svc_model.predict(self.X_test)
+    def train_gradient_boosting_clf(self):
+        self.model = GradientBoostingModel(seed=self.rnd_seed)
+        self.model.train(self.X_train, self.y_train)
+        self.y_pred = self.model.predict(self.X_test)
 
-        self.test_acc = accuracy_score(self.y_test, self.linearsvc_y_pred)
-        print(f"Linear SVC accuracy on test set = {self.test_acc}")
-        self.next(self.save_model_to_s3)
+        self.test_acc = accuracy_score(self.y_test, self.y_pred)
+        print(f"Gradient Boosting Classifier accuracy on test set = {self.test_acc}")
 
-
-    @step
-    def save_model_to_s3(self):
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        self.svc_model.save_model_local(f'linearsvc_{timestr}_acc{self.test_acc}.joblib')
-        # self.svc_model.save_model_s3(full_s3_path=f's3://mtszkw-github/sentiment/linearsvc_{timestr}.joblib')
+        self.model.save_model_local(f'gradientboost_{timestr}_acc{self.test_acc}.joblib')
+
         self.next(self.visualize_results)
+
+
+    # @step
+    # def save_model_to_s3(self):
+    #     timestr = time.strftime("%Y%m%d-%H%M%S")
+    #     self.svc_model.save_model_local(f'linearsvc_{timestr}_acc{self.test_acc}.joblib')
+    #     # self.svc_model.save_model_s3(full_s3_path=f's3://mtszkw-github/sentiment/linearsvc_{timestr}.joblib')
+    #     self.next(self.visualize_results)
 
 
     @step
     def visualize_results(self):
-        print(f"LinearSVC:\n{classification_report(self.y_test, self.linearsvc_y_pred)}")
+        print(f"Gradient Boosting Classifier:\n{classification_report(self.y_test, self.y_pred)}")
         self.next(self.end)
 
 

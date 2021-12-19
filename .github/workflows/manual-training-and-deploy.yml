@@ -1,52 +1,52 @@
-name: Manual Train and Deploy
+# name: Manual Train and Deploy
 
-on: 
-  workflow_dispatch:
-    inputs:
-      rnd_seed:
-        description: 'Seed for Random Number Generator'     
-        required: true
-        default: '42'
-      test_size:
-        description: 'Size of test set for train-test split (in %)'     
-        required: true
-        default: '0.1'
-      tags:
-        description: 'Tags for this pipeline execution (optional)'  
+# on: 
+#   workflow_dispatch:
+#     inputs:
+#       rnd_seed:
+#         description: 'Seed for Random Number Generator'     
+#         required: true
+#         default: '42'
+#       test_size:
+#         description: 'Size of test set for train-test split (in %)'     
+#         required: true
+#         default: '0.1'
+#       tags:
+#         description: 'Tags for this pipeline execution (optional)'  
 
-jobs:
-  auto_train_and_deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
+# jobs:
+#   auto_train_and_deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v2
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+#     - name: Set up Python 3.8
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: 3.8
 
-    - name: Install dependencies
-      run: |
-        make setup_environment
+#     - name: Install dependencies
+#       run: |
+#         make setup_environment
 
-    - name: Set AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+#     - name: Set AWS Credentials
+#       uses: aws-actions/configure-aws-credentials@v1
+#       with:
+#         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Query S3 bucket with input data
-      run: |
-        aws s3 ls s3://mtszkw-github/sentiment/
+#     - name: Query S3 bucket with input data
+#       run: |
+#         aws s3 ls s3://mtszkw-github/sentiment/
 
-    - name: Train on a subset of data
-      run: |
-        make training \
-          QUICKRUN_PCT=0.1 \
-          RND_SEED=${{ github.event.inputs.rnd_seed }} \
-          TEST_SIZE=${{ github.event.inputs.test_size }}
+#     - name: Train on a subset of data
+#       run: |
+#         make training \
+#           QUICKRUN_PCT=0.1 \
+#           RND_SEED=${{ github.event.inputs.rnd_seed }} \
+#           TEST_SIZE=${{ github.event.inputs.test_size }}
 
-    - name: Check for model artifact
-      run: |
-        ls -al
+#     - name: Check for model artifact
+#       run: |
+#         ls -al

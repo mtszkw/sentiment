@@ -52,9 +52,6 @@ class TrainingFlow(FlowSpec):
 
     @step
     def dataset_cleanup(self):
-        print(f"Rows before cleanup: {self.df_raw.shape}")
-        self.df_raw = self.df_raw[self.df_raw.sentiment != 2]
-        print(f"Rows after cleanup (only two classes): {self.df_raw.shape}")
         self.texts_list = self.df_raw['text'].tolist()
         self.sentiments_list = self.df_raw['sentiment'].tolist()
         self.next(self.train_test_split)
@@ -129,7 +126,7 @@ class TrainingFlow(FlowSpec):
 
     @step
     def visualize_results(self):
-        print(f"Gradient Boosting Classifier:\n{classification_report(self.y_test, self.y_pred)}")
+        print(f"Gradient Boosting Classifier:\n{accuracy_score(self.y_test, self.y_pred)}")
         self.next(self.end)
 
 

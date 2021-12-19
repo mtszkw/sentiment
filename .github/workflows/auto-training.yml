@@ -53,3 +53,12 @@ jobs:
           --vectorizer_joblib_path=$(ls | grep tfidf_vectorizer*.joblib) \
           --input_text="I hate writing YAML files, they are awful" > output.txt
         grep Negative output.txt
+
+    - name: Test Flask App inference
+      run: |
+        cp *.joblib inference/flask_app/
+        cp pipeline/TextPreprocessing.py inference/flask_app/
+
+        cd inference/flask_app
+        ls 
+        docker build .

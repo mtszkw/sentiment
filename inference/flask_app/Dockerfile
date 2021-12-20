@@ -1,9 +1,9 @@
-FROM python:3.8-alpine
+FROM jupyter/scipy-notebook
 
 WORKDIR /
 
 COPY . .
 
-RUN pip install scikit-learn==1.0.1 flask
+RUN pip install -r requirements.txt
 
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]

@@ -36,3 +36,6 @@ def predict(data):
 
     output = load_model().predict(text_embeddings)
     return output
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')

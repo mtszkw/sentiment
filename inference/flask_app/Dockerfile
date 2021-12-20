@@ -2,9 +2,7 @@ FROM python:3.8-alpine
 
 WORKDIR /
 
-COPY model_*.joblib model.joblib
-COPY vectorizer_*.joblib vectorizer.joblib
-COPY TextPreprocessing.py TextPreprocessing.py 
+COPY . .
 
 RUN pip install scikit-learn==1.0.1 flask
 

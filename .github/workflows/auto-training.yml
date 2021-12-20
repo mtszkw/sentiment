@@ -34,7 +34,7 @@ jobs:
 
     - name: Train on a subset of data
       run: |
-        make training QUICKRUN_PCT=0.25 RND_SEED=2020 TEST_SIZE=0.15
+        make training QUICKRUN_PCT=0.2 RND_SEED=2020 TEST_SIZE=0.1
 
     - name: Check for model artifact
       run: |
@@ -56,7 +56,8 @@ jobs:
 
     - name: Test Flask App inference
       run: |
-        cp *.joblib inference/flask_app/
+        cp gradientboost*.joblib inference/flask_app/model.joblib
+        cp tfidf_vectorizer*.joblib inference/flask_app/vectorizer.joblib
         cp pipeline/TextPreprocessing.py inference/flask_app/
 
         cd inference/flask_app

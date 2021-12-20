@@ -28,12 +28,13 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Query S3 bucket with input data
-      run: |
-        aws s3 ls s3://mtszkw-github/sentiment/
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1 
 
     - name: Train on a subset of data
       run: |
+        aws s3 ls s3://mtszkw-github/sentiment/
         make training QUICKRUN_PCT=0.2 RND_SEED=2020 TEST_SIZE=0.1
 
     - name: Check for model artifact
@@ -42,24 +43,32 @@ jobs:
 
     - name: Test Console App inference
       run: |
+        MODEL_PATH=$(ls | grep gradientboost_*.joblib)
+        VECTORIZER_PATH=$(ls | grep tfidf_vectorizer*.joblib)
+
         python3 inference/console_app/main.py \
-          --model_joblib_path=$(ls | grep gradientboost_*.joblib) \
-          --vectorizer_joblib_path=$(ls | grep tfidf_vectorizer*.joblib) \
+          --model_joblib_path=$MODEL_PATH \
+          --vectorizer_joblib_path=$VECTORIZER_PATH \
           --input_text="I am sure this test will end with a success!" > output.txt
         grep Positive output.txt
 
         python3 inference/console_app/main.py \
-          --model_joblib_path=$(ls | grep gradientboost_*.joblib) \
-          --vectorizer_joblib_path=$(ls | grep tfidf_vectorizer*.joblib) \
+          --model_joblib_path=$MODEL_PATH \
+          --vectorizer_joblib_path=$VECTORIZER_PATH \
           --input_text="I hate writing YAML files, they are awful" > output.txt
         grep Negative output.txt
 
-    - name: Test Flask App inference
+    - name: Build and push Flask application image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: sentiment
+        IMAGE_TAG: ${{ github.sha }}
       run: |
         cp gradientboost*.joblib inference/flask_app/model.joblib
         cp tfidf_vectorizer*.joblib inference/flask_app/vectorizer.joblib
         cp pipeline/TextPreprocessing.py inference/flask_app/
 
         cd inference/flask_app
-        ls 
-        docker build .
+        ls
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
